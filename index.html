@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { text-align: center; }
+        ul.status { text-align: right; width: 60%; }
+    </style>
+</head>
+<body>
+    <h1><strong>Type</strong>Network Status</h1>
+    
+    <ul class="status">
+        <li>store.typenetwork.com being served: <span id="store-status">?</span></li>
+        <li>Web fonts being served: <span id="webfonts-status">?</span></li>
+        <li>Orders being served: <span id="orders-status">?</span></li>
+        <li>Emails being sent: <span id="email-status">?</span></li>
+    </ul>
+
+    <p id="status-description" style="text-align: center"><p>
+        
+    <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <script>
+        function storeCheck() {
+            return $.get('https://store.typenetwork.com/').then(function(data, status, xhr) {
+                if (status == 200) {
+                    $('#store-status').text('Y');
+                    return true;
+                }
+                $('#store-status').text('N');
+                return false;
+            }).fail(function() {
+                $('#store-status').text('N');
+                return false;
+            });
+        }
+
+        function statusCheck() {
+            console.log('statusCheck', new Date());
+            let storeStatus = false;
+
+            // check web fonts status.
+            return storeCheck().then(function(result) {
+                storeStatus = true;
+            });
+            
+        }
+        $(function() {
+            // initialize status
+            statusCheck().then(function() {
+                // update in 10s intervals.
+                setInterval(statusCheck, 10000);
+            });
+        });
+    </script>
+
+</body>
+</html>
