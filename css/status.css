@@ -14,14 +14,16 @@ ul.status {
 }
 
 ul.status li {
+    margin-bottom: 0.5em;
 }
 
 ul.status li img.throbber {
-    /*padding-bottom: 0.15em;*/
-    max-height: 0.7em;
+    max-height: 1.2ex;
+    vertical-align: baseline;
 }
 
 div.contact {
     max-width: 70%;
     margin: 0 auto;
+    line-height: 1.5;
 }

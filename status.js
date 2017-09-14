@@ -165,7 +165,8 @@
         return args.reduce( function(status, arg) {
             if(arg === 'warn') {
                 if(status != 'down') {
-                    return 'warn';
+                    // return 'warn'; // mask out "warnings" for now, these count as "good"
+                    return 'good';
                 }
             } else if( arg === false ) {
                 return 'down';
