@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" ><!-- Declare language so CSS hyphenation will work -->
+<head>
+	<meta charset="UTF-8"> <!-- this is supposed to appear in the first 1024 bytes of the page -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-TileImage" content="/mstile-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="description" content="Type Network offers a curated selection of typefaces from quality foundries for use across desktop, web, apps, and more.">
+	<meta name="keywords" content="typeface,typography,web font,desktop font,app font,ePub font,responsive design,fonts,typefaces">
+
+	<title>Type Network</title>
+
+	<link rel="stylesheet" href="/css/iconfont/icon_font.css">
+	<link rel="stylesheet" href="/css/tn.css">
+	<!-- <link rel="stylesheet" href="/css/style.css"> -->
+
+    <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+	<base href="/">
+</head>
+
+<body ng-app="tn.app" ng-class="pageWrapperCssClasses" class="ng-scope template-error">
+	<div id="page_wrapper">
+		<header id="top" ui-view="header" class="ng-scope">
+			<div id="nav_bar" class="ng-scope">
+				<header class="header-global" ng-class="{'hijacked': user.hijacked}">
+					<h1><a ng-href="http://www.typenetwork.com/" href="http://www.typenetwork.com/">Type Network</a></h1>
+				</header>
+				<nav class="nav-global" ng-class="{'hijacked': user.hijacked}">
+					<a class="nav-global-reveal" href="#">Menu</a>
+					<ul>
+						<li><a class="nav-home-link" ng-href="http://www.typenetwork.com/" href="http://www.typenetwork.com/">Home</a></li>
+						<li><a ui-sref="home.fonts.listing" ui-sref-opts="{inherit:false}" class="nav-active-item" href="/fonts/">Fonts</a></li>
+						<li><a ng-href="http://www.typenetwork.com/news" href="http://www.typenetwork.com/news">News</a></li>
+						<li><a ng-href="http://www.typenetwork.com/gallery" href="http://www.typenetwork.com/gallery">Gallery</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<div id="content">
+			<div class="add_padding_for_footer">
+				<div id="main" role="main" ui-view="main" class="ng-scope"><h1 class="ng-scope">Type <span class="not">Not</span>work?</h1>
+				<h2 class="ng-scope">Try a search.</h2>
+				<form ng-submit="vm.submit()" class="search ng-pristine ng-valid ng-scope">
+					<span class="icon-search"></span>
+					<input name="name" type="text" ng-model="vm.search" placeholder="Look up a family" tn-noauto="" class="ng-pristine ng-untouched ng-valid ng-empty" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+					<input type="submit" value="Submit">
+				</form>
+				<div class="contact ng-scope">Or contact us at <a href="mailto:info@typenetwork.com">info@typenetwork.com</a>.</div></div>
+				<footer class="footer-global" id="footer">
+					<ul>
+						<li><a href="http://www.typenetwork.com/about">About Type Network</a></li>
+						<li><a href="http://typenetwork.com/support">Help and Support</a></li>
+					</ul>
+					<p>© Copyright Type Network <tn-current-datetime format="yyyy" class="ng-binding ng-isolate-scope">2017</tn-current-datetime>. All Rights Reserved.</p>
+				</footer>
+			</div>
+		</div>
+	</div>
+</body>
+
+
+</html>
