@@ -14,6 +14,8 @@
         sparkpostRunning,
         cloudflareRunning;
     var affectedSystem;
+    var firstPartyAffected = false;
+    var thirdPartyAffected = false;
 
     function _httpHealthCheck(url) {
         return $.get(url).then(function(data, status, xhr) {
@@ -28,6 +30,7 @@
             storeRunning = result.status !== null && result.xhr.status === 200;
             if(!storeRunning) {
                 affectedSystem = 'Store Server';
+                firstPartyAffected = true;
             }
         });
     }
@@ -49,6 +52,7 @@
 
             if(cloudflareRunning !== true) {
                 affectedSystem = 'CloudFlare CDN';
+                thirdPartyAffected = true;
             }
         });
     }
@@ -84,6 +88,7 @@
 
             if(edgecastRunning !== true) {
                 affectedSystem = 'EdgeCast CDN';
+                thirdPartyAffected = true;
             }
         });
     }
@@ -99,10 +104,22 @@
                 redisrunning = data.redis === 'running';
                 nginxrunning = data.nginx === 'running';
 
-                if(!celeryRunning) { affectedSystem = 'Celery System'; }
-                if(!psqlrunning || !dbrunning) { affectedSystem = 'Database Server'; }
-                if(!redisrunning) { affectedSystem = 'Redis Server'; }
-                if(!nginxrunning) { affectedSystem = 'Web Server'; }
+                if(!celeryRunning) { 
+                    affectedSystem = 'Celery System'; 
+                    firstPartyAffected = true; 
+                }
+                if(!psqlrunning || !dbrunning) { 
+                    affectedSystem = 'Database Server'; 
+                    firstPartyAffected = true; 
+                }
+                if(!redisrunning) { 
+                    affectedSystem = 'Redis Server'; 
+                    firstPartyAffected = true; 
+                }
+                if(!nginxrunning) { 
+                    affectedSystem = 'Web Server'; 
+                    firstPartyAffected = true; 
+                }
             } else {
                 apiRunning = false;
                 celeryRunning = false;
@@ -111,6 +128,7 @@
                 nginxrunning = false;
 
                 affectedSystem = 'API Server';
+                firstPartyAffected = true; 
             }
         });
     }
@@ -133,6 +151,7 @@
 
             if(sparkpostRunning !== true) {
                 affectedSystem = 'Sparkpost Mailer';
+                thirdPartyAffected = true;
             }
         });
     }
@@ -197,7 +216,12 @@
             if(finalStatus === 'good') {
                 $('.contact.status_good_state').css('display', '');
             } else {
-                $('#status_affected_system').text(affectedSystem);
+                $('#status_affected_system').text(
+                    firstPartyAffected ? 'our server' : 'one of our third-party providers'
+                );
+                if(!firstPartyAffected) {
+                    $('#status_aware').css('display', 'none');
+                }
                 $('.contact.status_error_state').css('display', '');
             }
         });
