@@ -1,78 +1,192 @@
-'use strict';
+(function(){
+    'use strict';
 
-function _httpHealthCheck(url) {
-    return $.get(url).then(function(data, status, xhr) {
-        return { data: data, status: status, xhr: xhr };
-    }).fail(function(xhr) {
-        return { data: {}, status: null, xhr };
+    var healthy = true;
+    var messages = [];
+    var storeRunning,
+        apiRunning,
+        celeryRunning, 
+        psqlrunning, 
+        dbrunning,
+        redisrunning, 
+        nginxrunning,
+        edgecastRunning,
+        sparkpostRunning,
+        cloudflareRunning;
+    var affectedSystem;
+
+    function _httpHealthCheck(url) {
+        return $.get(url).then(function(data, status, xhr) {
+            return { data: data, status: status, xhr: xhr };
+        }).fail(function(xhr) {
+            return { data: {}, status: null, xhr: xhr };
+        });
+    }
+
+    function storeCheck() {
+        return _httpHealthCheck('https://store.typenetwork.com/').then(function(result) {
+            storeRunning = result.status !== null && result.xhr.status === 200;
+        });
+    }
+
+    function cloudflareCheck() {
+        return _httpHealthCheck('https://yh6f0r4529hb.statuspage.io/api/v2/status.json').then(function(result){
+            var data = result.data;
+            if(result.status !== null && result.xhr.status === 200 && data.status) {
+                if(data.status.indicator === 'none') {
+                    cloudflareRunning = true;
+                } else if(data.status.indicator === 'minor') {
+                    cloudflareRunning = 'warn';
+                } else {
+                    cloudflareRunning = false;
+                }
+            } else {
+                cloudflareRunning = false;
+            }
+        });
+    }
+
+    function edgecastCheck() {
+        return _httpHealthCheck('https://api.status.io/1.0/status/5736344c90417cda1a000f3f').then(function(result) {
+            if(result.status !== null && result.xhr.status === 200) {
+                // ensure we always seek; god forbid they change the order of this thing on us
+                var httpSmall = result.data.result.status.filter(function(status) {
+                    return status.name === 'HTTP Small Object CDN';
+                })[0];
+                if(!httpSmall)
+                {   
+                    edgecastRunning = false;
+                }
+                else
+                {
+                    switch(httpSmall.status_code){
+                        case 100:
+                        case 200: 
+                            edgecastRunning = true;
+                            break;
+                        case 300: 
+                            edgecastRunning = 'warn';
+                            break;
+                        default: 
+                            edgecastRunning = false;
+                            messages.push('Web fonts: Edgecast  ' + httpSmall.name + ' ' + httpSmall.status)
+                    }
+                }
+            } else {
+                edgecastRunning = false;
+            }
+        });
+    }
+
+    function apiCheck() {
+        return _httpHealthCheck('https://api.typenetwork.com/api/1/health?format=json').then(function(result) {
+            var data = result.data;
+            if(result.status !== null && result.xhr.status === 200) {
+                apiRunning = true;
+                celeryRunning = data.celery === 'running' && data.celerybeat === 'running';
+                psqlrunning = data.postgresql === 'running';
+                dbrunning = data.database === 'running';
+                redisrunning = data.redis === 'running';
+                nginxrunning = data.nginx === 'running';
+            } else {
+                apiRunning = false;
+                celeryRunning = false;
+                psqlrunning = false;
+                redisrunning = false;
+                nginxrunning = false;
+            }
+        });
+    }
+
+    function sparkpostCheck() {
+        //https://ua.statuspage.io/ua?page_code=7ky1q6zd3fyp&organization_code=0y9qf7hln9fv&paid=true                  
+        return _httpHealthCheck('https://7ky1q6zd3fyp.statuspage.io/api/v2/status.json').then(function(result){
+            var data = result.data;
+            if(result.status !== null && result.xhr.status === 200 && data.status) {
+                if(data.status.indicator === 'none') {
+                    sparkpostRunning = true;
+                } else if(data.status.indicator === 'minor') {
+                    sparkpostRunning = 'warn';
+                } else {
+                    sparkpostRunning = false;
+                }
+            } else {
+                sparkpostRunning = false;
+            }
+        });
+    }
+
+    function setStatus(selector, value) {
+        $(selector).text(value);
+    }
+
+    function getComposite() {
+        var args = Array.prototype.slice.call(arguments);
+        return args.reduce( function(status, arg) {
+            if(arg === 'warn') {
+                if(status != 'down') {
+                    return 'warn';
+                }
+            } else if( arg === false ) {
+                return 'down';
+            }
+            return status;
+        }, 'good');
+    }
+
+    function statusCheck() {
+
+        return $.when(
+            storeCheck(),
+            edgecastCheck(),
+            cloudflareCheck(),
+            apiCheck(),
+            sparkpostCheck()
+        ).done(function() {
+            // now we build the composites ... 
+            var webFontsStatus = getComposite(
+                edgecastRunning, apiRunning, redisrunning
+            );
+
+            var orderStatus = getComposite(
+                cloudflareRunning, apiRunning, storeRunning, psqlrunning, dbrunning, redisrunning, nginxrunning
+            );
+
+            var emailStatus = getComposite(
+                apiRunning, celeryRunning, sparkpostRunning
+            );
+
+            var finalStatus = 'good';
+            [ ['#webfonts-status', webFontsStatus], ['#orders-status', orderStatus], ['#email-status', emailStatus] ].forEach(function(tuple) {
+                var selector = tuple[0];
+                var status = tuple[1];
+                if(status === 'good') {
+                    $(selector).find('img').attr('src', 'images/check.png');
+                } else if( status === 'warn') {
+                    $(selector).find('img').attr('src', 'images/hastywarning.png');
+                    if(finalStatus != 'down') {
+                        finalStatus = 'warn';
+                    }
+                } else {
+                    $(selector).find('img').attr('src', 'images/hastyx.png');
+                    finalStatus = 'down';
+                }
+            });
+
+            if(finalStatus === 'good') {
+                $('.contact.status_good_state').css('display', '');
+            } else {
+                $('.contact.status_error_state').css('display', '');
+            }
+        });
+    }
+      
+
+    $(function() {
+        // initialize status
+        statusCheck().then(function() {
+            // update in 10s intervals.
+            // setInterval(statusCheck, 10000);
+        });
     });
-}
-
-function storeCheck() {
-    return _httpHealthCheck('https://store.typenetwork.com/');
-}
-
-function cloudflareCheck() {
-    return _httpHealthCheck('https://yh6f0r4529hb.statuspage.io/api/v2/status.json');
-}
-
-function edgecastCheck() {
-    return _httpHealthCheck('https://api.status.io/1.0/status/5736344c90417cda1a000f3f');
-}
-
-function apiCheck() {
-    return _httpHealthCheck('https://api.typenetwork.com/api/1/health-check');
-}
-
-function sparkpostCheck() {
-    //https://ua.statuspage.io/ua?page_code=7ky1q6zd3fyp&organization_code=0y9qf7hln9fv&paid=true                  
-    return _httpHealthCheck('https://7ky1q6zd3fyp.statuspage.io/api/v2/status.json');
-}
-
-function setStatus(selector, value) {
-    $(selector).text(value);
-}
-
-function statusCheck() {
-    let healthy = true;
-    let messages = [];
-
-    // check web fonts status.
-    return storeCheck().then(function(result) {
-        setStatus('#store-status', result.xhr.status === 200 ? 'Y' : 'N');
-    }).then(edgecastCheck).then(function(result) {
-        console.log('edgecastCheck', result);
-        let httpSmall = result.data.result.status[6];
-        let indicator = 'N';
-        switch(httpSmall.status_code){
-            case 200: 
-                indicator = 'Y'; 
-                break;
-            case 300: 
-                indicator = 'P'; 
-            default: 
-                messages.push('Web fonts: Edgecast  ' + httpSmall.name + ' ' + httpSmall.status)
-        }
-        setStatus('#webfonts-status', indicator);
-    }).then(apiCheck).then(function(result) {
-        console.log('apiCheck', result);
-    }).then(sparkpostCheck).then(function(result) {
-        console.log('sparkpostCheck', result);
-    }).then(function() {
-        if (messages.length == 0) {
-            $('#status-description').text("Everything is running smoothly here, but if  you are still experiencing issues, feel free to consult the Type Network support pages or contact us directly.");
-        }
-        else {
-            $('#status-description').html(messages.join('<br />'));
-        }
-    });
-}
-  
-
-$(function() {
-    // initialize status
-    statusCheck().then(function() {
-        // update in 10s intervals.
-        // setInterval(statusCheck, 10000);
-    });
-});
+})();

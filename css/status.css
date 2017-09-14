@@ -1,2 +1,27 @@
-body { text-align: center; }
-ul.status { text-align: right; width: 60%; }
+html body #main h1.status_header {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+}
+
+ul.status {
+    position: relative;
+    line-height: 1.2;
+    width: 50%;
+    left: 10%;
+    text-align: right;
+    font-size: 180%;
+    color: black;
+}
+
+ul.status li {
+}
+
+ul.status li img.throbber {
+    /*padding-bottom: 0.15em;*/
+    max-height: 0.7em;
+}
+
+div.contact {
+    max-width: 70%;
+    margin: 0 auto;
+}
