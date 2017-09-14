@@ -26,6 +26,9 @@
     function storeCheck() {
         return _httpHealthCheck('https://store.typenetwork.com/').then(function(result) {
             storeRunning = result.status !== null && result.xhr.status === 200;
+            if(!storeRunning) {
+                affectedSystem = 'Store Server';
+            }
         });
     }
 
@@ -42,6 +45,10 @@
                 }
             } else {
                 cloudflareRunning = false;
+            }
+
+            if(cloudflareRunning !== true) {
+                affectedSystem = 'CloudFlare CDN';
             }
         });
     }
@@ -69,11 +76,14 @@
                             break;
                         default: 
                             edgecastRunning = false;
-                            messages.push('Web fonts: Edgecast  ' + httpSmall.name + ' ' + httpSmall.status)
                     }
                 }
             } else {
                 edgecastRunning = false;
+            }
+
+            if(edgecastRunning !== true) {
+                affectedSystem = 'EdgeCast CDN';
             }
         });
     }
@@ -88,12 +98,19 @@
                 dbrunning = data.database === 'running';
                 redisrunning = data.redis === 'running';
                 nginxrunning = data.nginx === 'running';
+
+                if(!celeryRunning) { affectedSystem = 'Celery System'; }
+                if(!psqlrunning || !dbrunning) { affectedSystem = 'Database Server'; }
+                if(!redisrunning) { affectedSystem = 'Redis Server'; }
+                if(!nginxrunning) { affectedSystem = 'Web Server'; }
             } else {
                 apiRunning = false;
                 celeryRunning = false;
                 psqlrunning = false;
                 redisrunning = false;
                 nginxrunning = false;
+
+                affectedSystem = 'API Server';
             }
         });
     }
@@ -112,6 +129,10 @@
                 }
             } else {
                 sparkpostRunning = false;
+            }
+
+            if(sparkpostRunning !== true) {
+                affectedSystem = 'Sparkpost Mailer';
             }
         });
     }
@@ -176,6 +197,7 @@
             if(finalStatus === 'good') {
                 $('.contact.status_good_state').css('display', '');
             } else {
+                $('#status_affected_system').text(affectedSystem);
                 $('.contact.status_error_state').css('display', '');
             }
         });
