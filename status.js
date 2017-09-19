@@ -17,6 +17,14 @@
     var firstPartyAffected = false;
     var thirdPartyAffected = false;
 
+    function _populateDetail(selector, status) {
+        $(selector).find('img').attr('src', 
+            status === true ? 'images/check.png' : 
+            status === 'warn' ? 'images/hastywarning.png' :
+            status === false ? 'images/hastyx.png' : ''
+        );
+    }
+
     function _httpHealthCheck(url) {
         return $.get(url).then(function(data, status, xhr) {
             return { data: data, status: status, xhr: xhr };
@@ -54,6 +62,8 @@
                 affectedSystem = 'CloudFlare CDN';
                 thirdPartyAffected = true;
             }
+
+            _populateDetail('#status_cloudflare_detail', cloudflareRunning);
         });
     }
 
@@ -90,6 +100,8 @@
                 affectedSystem = 'EdgeCast CDN';
                 thirdPartyAffected = true;
             }
+
+            _populateDetail('#status_edgecast_detail', edgecastRunning);
         });
     }
 
@@ -124,12 +136,19 @@
                 apiRunning = false;
                 celeryRunning = false;
                 psqlrunning = false;
+                dbrunning = false;
                 redisrunning = false;
                 nginxrunning = false;
 
                 affectedSystem = 'API Server';
                 firstPartyAffected = true; 
             }
+
+            _populateDetail('#status_api_detail', apiRunning);
+            _populateDetail('#status_celery_detail', celeryRunning);
+            _populateDetail('#status_redis_detail', redisrunning);
+            _populateDetail('#status_nginx_detail', nginxrunning);
+            _populateDetail('#status_psql_detail', psqlrunning);
         });
     }
 
@@ -153,6 +172,8 @@
                 affectedSystem = 'Sparkpost Mailer';
                 thirdPartyAffected = true;
             }
+
+            _populateDetail('#status_sparkpost_detail', sparkpostRunning);
         });
     }
 
