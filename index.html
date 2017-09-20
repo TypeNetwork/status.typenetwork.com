@@ -1,60 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ><!-- Declare language so CSS hyphenation will work -->
 <head>
-    <style>
-        body { text-align: center; }
-        ul.status { text-align: right; width: 60%; }
-    </style>
-</head>
-<body>
-    <h1><strong>Type</strong>Network Status</h1>
-    
-    <ul class="status">
-        <li>store.typenetwork.com being served: <span id="store-status">?</span></li>
-        <li>Web fonts being served: <span id="webfonts-status">?</span></li>
-        <li>Orders being served: <span id="orders-status">?</span></li>
-        <li>Emails being sent: <span id="email-status">?</span></li>
-    </ul>
+    <meta charset="UTF-8"> <!-- this is supposed to appear in the first 1024 bytes of the page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
 
-    <p id="status-description" style="text-align: center"><p>
-        
+    <title>Type Network Status</title>
+
+    <link rel="stylesheet" href="/css/iconfont/icon_font.css">
+    <link rel="stylesheet" href="/css/tn.css">
+    <link rel="stylesheet" href="/css/status.css">
+
     <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
             crossorigin="anonymous"></script>
+    <script src="status.js"></script>
 
-    <script>
-        function storeCheck() {
-            return $.get('https://store.typenetwork.com/').then(function(data, status, xhr) {
-                if (status == 200) {
-                    $('#store-status').text('Y');
-                    return true;
-                }
-                $('#store-status').text('N');
-                return false;
-            }).fail(function() {
-                $('#store-status').text('N');
-                return false;
-            });
-        }
+    <base href="/">
+</head>
 
-        function statusCheck() {
-            console.log('statusCheck', new Date());
-            let storeStatus = false;
-
-            // check web fonts status.
-            return storeCheck().then(function(result) {
-                storeStatus = true;
-            });
-            
-        }
-        $(function() {
-            // initialize status
-            statusCheck().then(function() {
-                // update in 10s intervals.
-                setInterval(statusCheck, 10000);
-            });
-        });
-    </script>
-
+<body ng-app="tn.app" ng-class="pageWrapperCssClasses" class="ng-scope template-error">
+    <div id="page_wrapper">
+        <header id="top" ui-view="header" class="ng-scope">
+            <div id="nav_bar" class="ng-scope">
+                <header class="header-global" ng-class="{'hijacked': user.hijacked}">
+                    <h1><a ng-href="http://www.typenetwork.com/" href="http://www.typenetwork.com/">Type Network</a></h1>
+                </header>
+                <nav class="nav-global" ng-class="{'hijacked': user.hijacked}">
+                    <a class="nav-global-reveal" href="#">Menu</a>
+                    <ul>
+                        <li><a class="nav-home-link" href="http://www.typenetwork.com/">Home</a></li>
+                        <li><a href="http://store.typenetwork.com/">Fonts</a></li>
+                        <li><a href="http://www.typenetwork.com/news">News</a></li>
+                        <li><a href="http://www.typenetwork.com/gallery">Gallery</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <div id="content">
+            <div class="add_padding_for_footer">
+                <div id="main">
+                    <h1 class="status_header">
+                        <img src="images/TypeNetwork-LogoType_MSD-70_72pt.svg" alt="TypeNetwork"> Status
+                    </h1>
+                    <ul class="status">
+                        <li>Web fonts being served: <span id="webfonts-status"><img class="throbber" src="images/loading.gif"></span></li>
+                        <li>Orders being processed: <span id="orders-status"><img class="throbber" src="images/loading.gif"></span></li>
+                        <li>Emails being sent: <span id="email-status"><img class="throbber" src="images/loading.gif"></span></li>
+                    </ul>
+                    <div style="display:none" class="contact status_good_state">Everything is running smoothly here, but if you are still experiencing any issues, feel free to consult the Type Network <a href="https://www.typenetwork.com/support">support pages</a> or <a href="mailto:info@typenetwork.com">contact us</a> directly.</div>
+                    <div style="display:none" class="contact status_error_state">Uh oh, looks like we’ve got a problem with <span id="status_affected_system">one of our third-party providers</span>. <span id="status_aware">We’re aware of the issue and are working to fix the problem. </span>If you have any further questions, please <a href="mailto:info@typenetwork.com">contact us</a>.</div>
+                    <ul class="status_details">
+                        <li id="status_edgecast_detail"><img src="images/loading.gif"><a href="https://status.verizondigitalmedia.com">Edgecast</a></li>
+                        <li id="status_cloudflare_detail"><img src="images/loading.gif"><a href="https://www.cloudflarestatus.com">Cloudflare</a></li>
+                        <li id="status_sparkpost_detail"><img src="images/loading.gif"><a href="https://status.sparkpost.com">Sparkpost</a></li>
+                        <li id="status_api_detail"><img src="images/loading.gif"><a href="https://rpm.newrelic.com/accounts/1345304/applications/19048925">TN.com API</a></li>
+                        <li id="status_celery_detail"><img src="images/loading.gif"><a href="https://rpm.newrelic.com/accounts/1345304/applications/19048925">Celery</a></li>
+                        <li id="status_psql_detail"><img src="images/loading.gif"><a href="https://rpm.newrelic.com/accounts/1345304/applications/19048925">PSQL</a></li>
+                        <li id="status_redis_detail"><img src="images/loading.gif"><a href="https://rpm.newrelic.com/accounts/1345304/applications/19048925">Redis</a></li>
+                        <li id="status_nginx_detail"><img src="images/loading.gif"><a href="https://rpm.newrelic.com/accounts/1345304/applications/19048925">Nginx</a></li>
+                    </ul>
+                </div>
+                <footer class="footer-global" id="footer">
+                    <ul>
+                        <li><a href="http://www.typenetwork.com/about">About Type Network</a></li>
+                        <li><a href="http://typenetwork.com/support">Help and Support</a></li>
+                    </ul>
+                    <p>© Copyright Type Network <tn-current-datetime format="yyyy" class="ng-binding ng-isolate-scope">2017</tn-current-datetime>. All Rights Reserved.</p>
+                </footer>
+            </div>
+        </div>
+    </div>
 </body>
+
+
 </html>
+
+
+
+    
+        

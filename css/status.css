@@ -1,0 +1,71 @@
+html body #main h1.status_header {
+    margin-top: 1.2em;
+    margin-bottom: 1em;
+    color: #808285;
+    font-weight: 100;
+}
+
+html body #main h1.status_header svg,
+html body #main h1.status_header img {
+    max-height: 1em;
+}
+
+
+ul.status {
+    width: 80%;
+    margin: 0 auto;
+    position: relative;
+    line-height: 1.2;
+    text-align: right;
+    font-size: 180%;
+    color: black;
+}
+
+@media (min-width:40.625rem){
+    ul.status {
+        margin: 0;
+        left: 10%;
+        width: 50%;
+    }   
+}
+
+ul.status li {
+    margin-bottom: 0.5em;
+}
+
+ul.status li img.throbber,
+ul.status_details img {
+    max-height: 1.2ex;
+    vertical-align: baseline;
+}
+
+ul.status_details {
+    margin-top: 2em;
+    color: black;
+    text-align: center;
+}
+
+ul.status_details:before,
+ul.status_details:after {
+    content: " ";
+    display: table;
+}
+
+ul.status_details:after {
+    clear: both;
+}
+
+ul.status_details li {
+    display: inline-block;
+    margin-right: 2em;
+}
+
+ul.status_details li img {
+    margin-right: 0.25em;
+}
+
+div.contact {
+    max-width: 70%;
+    margin: 0 auto;
+    line-height: 1.5;
+}
