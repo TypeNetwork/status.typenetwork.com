@@ -1,7 +1,13 @@
 html body #main h1.status_header {
     margin-top: 1.2em;
     margin-bottom: 1em;
+    color: #939598;
 }
+
+html body #main h1.status_header svg{
+    max-height: 1em;
+}
+
 
 ul.status {
     width: 80%;
