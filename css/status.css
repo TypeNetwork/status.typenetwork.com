@@ -39,9 +39,29 @@ ul.status_details img {
     vertical-align: baseline;
 }
 
-ul.status_details {
+.status_expando {
     margin-top: 2em;
     color: black;
+    clear: both;
+}
+
+@media (min-width:40.625rem){
+    .status_expando {
+        width: 80%;
+        margin: 2em auto 0;
+    }
+}
+
+.status_expando summary {
+    text-align: left;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+ul.status_details {
+    margin-top: 0.5em;
     text-align: center;
 }
 
@@ -58,6 +78,7 @@ ul.status_details:after {
 ul.status_details li {
     display: inline-block;
     margin-right: 2em;
+    margin-bottom: 0.25em;
 }
 
 ul.status_details li img {
