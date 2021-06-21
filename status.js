@@ -72,7 +72,7 @@
             if(result.status !== null && result.xhr.status === 200) {
                 // ensure we always seek; god forbid they change the order of this thing on us
                 var httpSmall = result.data.result.status.filter(function(status) {
-                    return status.name === 'HTTP Small Object CDN';
+                    return status.name === 'HTTP Small';
                 })[0];
                 if(!httpSmall)
                 {   
