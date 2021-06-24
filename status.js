@@ -96,7 +96,9 @@
                 edgecastRunning = false;
             }
 
-            if(edgecastRunning !== true) {
+            edgecastRunning = false;
+
+            if(true) { //edgecastRunning !== true
                 affectedSystem = 'EdgeCast CDN';
                 thirdPartyAffected = true;
             }
