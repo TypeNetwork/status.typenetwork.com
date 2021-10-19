@@ -6,7 +6,6 @@
     var storeRunning,
         apiRunning,
         celeryRunning, 
-        psqlrunning, 
         dbrunning,
         redisrunning, 
         nginxrunning,
@@ -86,6 +85,7 @@
                             edgecastRunning = true;
                             break;
                         case 300: 
+                        case 400:
                             edgecastRunning = 'warn';
                             break;
                         default: 
@@ -111,7 +111,6 @@
             if(result.status !== null && result.xhr.status === 200) {
                 apiRunning = true;
                 celeryRunning = data.celery === 'running' && data.celerybeat === 'running';
-                psqlrunning = data.postgresql === 'running';
                 dbrunning = data.database === 'running';
                 redisrunning = data.redis === 'running';
                 nginxrunning = data.nginx === 'running';
@@ -120,7 +119,7 @@
                     affectedSystem = 'Celery System'; 
                     firstPartyAffected = true; 
                 }
-                if(!psqlrunning || !dbrunning) { 
+                if(!dbrunning) { 
                     affectedSystem = 'Database Server'; 
                     firstPartyAffected = true; 
                 }
@@ -135,7 +134,6 @@
             } else {
                 apiRunning = false;
                 celeryRunning = false;
-                psqlrunning = false;
                 dbrunning = false;
                 redisrunning = false;
                 nginxrunning = false;
@@ -148,7 +146,6 @@
             _populateDetail('#status_celery_detail', celeryRunning);
             _populateDetail('#status_redis_detail', redisrunning);
             _populateDetail('#status_nginx_detail', nginxrunning);
-            _populateDetail('#status_psql_detail', psqlrunning);
         });
     }
 
@@ -211,7 +208,7 @@
             );
 
             var orderStatus = getComposite(
-                cloudflareRunning, apiRunning, storeRunning, psqlrunning, dbrunning, redisrunning, nginxrunning
+                cloudflareRunning, apiRunning, storeRunning, dbrunning, redisrunning, nginxrunning
             );
 
             var emailStatus = getComposite(
