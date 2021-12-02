@@ -11,6 +11,17 @@
     <link rel="stylesheet" href="/css/iconfont/icon_font.css">
     <link rel="stylesheet" href="/css/tn.css">
     <link rel="stylesheet" href="/css/status.css">
+    <script
+        src="https://browser.sentry-cdn.com/6.15.0/bundle.min.js"
+        integrity="sha384-uAr9Te+rNkmpaCjPTu4/ipQDpO1nR6fEY8JX+NHVNO5mY6LUs362JWJD8rHyaLEt"
+        crossorigin="anonymous"
+    ></script>
+    <script>
+        Sentry.init({
+            dsn: "https://67cf83084b414345be9fccda8fae135a@o1062695.ingest.sentry.io/6091405",
+            environment: 'prod'
+        });
+    </script>
 
     <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
